@@ -82,6 +82,31 @@ class AtCifsrRunResultParser(AtDefaultRunResultParser):
         return None
 
 
+class AtCipstartSetResultParser(object):
+
+    def __init__(self):
+        pass
+
+    def parse(self, command, connection, end_match='Linked\r'):
+
+        connection.readline()           # don't care for the OK
+        data = connection.readline()    # see if we get 'Linked'
+
+        return re.match(end_match, data) is not None
+
+
+class AtCipsendSetResultParser(object):
+
+    def __init__(self):
+        pass
+
+    def parse(self, command, connection, end_match='> '):
+
+        data = connection.read(len(end_match))    # see if we get '> '
+
+        return re.match(end_match, data) is not None
+
+
 class AtCommandSet(object):
     __metaclass__ = Singleton
 
@@ -91,6 +116,10 @@ class AtCommandSet(object):
     CWLAP = 'CWLAP'
     CWJAP = 'CWJAP'
     CIFSR = 'CIFSR'
+    CIPSTART = 'CIPSTART'
+    CIPMUX = 'CIPMUX'
+    CIPSEND = 'CIPSEND'
+    CIPCLOSE = 'CIPCLOSE'
 
     def __init__(self):
 
@@ -102,7 +131,11 @@ class AtCommandSet(object):
         self.commands[self.CWMODE] = At(self.CWMODE, supports_set=True, supports_query=True)
         self.commands[self.CWLAP] = At(self.CWLAP, supports_run=True)
         self.commands[self.CWJAP] = At(self.CWJAP, supports_set=True, supports_query=True)
-        self.commands[self.CIFSR] = At(self.CIFSR, supports_run=True, end_match="[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+\r|ERROR\r")
+        self.commands[self.CIFSR] = At(self.CIFSR, supports_run=True, end_match='[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+\r|ERROR\r')
+        self.commands[self.CIPSTART] = At(self.CIPSTART, supports_set=True)
+        self.commands[self.CIPMUX] = At(self.CIPMUX, supports_set=True, supports_query=True)
+        self.commands[self.CIPSEND] = At(self.CIPSEND, supports_set=True)
+        self.commands[self.CIPCLOSE] = At(self.CIPCLOSE, supports_run=True, supports_test=True, supports_set=True)
 
         # add special parsers
         pf = AtResultParserFactory()
@@ -110,6 +143,8 @@ class AtCommandSet(object):
         pf.add_parser(self.GMR, AtResultParserFactory.RUN, AtGmrRunResultParser())
         pf.add_parser(self.CWLAP, AtResultParserFactory.RUN, AtCwlapRunResultParser())
         pf.add_parser(self.CIFSR, AtResultParserFactory.RUN, AtCifsrRunResultParser())
+        pf.add_parser(self.CIPSTART, AtResultParserFactory.SET, AtCipstartSetResultParser())
+        pf.add_parser(self.CIPSEND, AtResultParserFactory.SET, AtCipsendSetResultParser())
 
     def get_command(self, command):
 

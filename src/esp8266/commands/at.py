@@ -32,7 +32,6 @@ class AtDefaultSetResultParser(object):
     def parse(self, command, connection, end_match='OK\r|no change\r'):
 
         data = connection.readline()
-
         return re.match(end_match, data) is not None
 
 
