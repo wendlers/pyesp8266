@@ -120,6 +120,7 @@ class AtCommandSet(object):
     CIPMUX = 'CIPMUX'
     CIPSEND = 'CIPSEND'
     CIPCLOSE = 'CIPCLOSE'
+    CIPSERVER = 'CIPSERVER'
 
     def __init__(self):
 
@@ -136,6 +137,7 @@ class AtCommandSet(object):
         self.commands[self.CIPMUX] = At(self.CIPMUX, supports_set=True, supports_query=True)
         self.commands[self.CIPSEND] = At(self.CIPSEND, supports_set=True)
         self.commands[self.CIPCLOSE] = At(self.CIPCLOSE, supports_run=True, supports_test=True, supports_set=True)
+        self.commands[self.CIPSERVER] = At(self.CIPSERVER, supports_set=True)
 
         # add special parsers
         pf = AtResultParserFactory()

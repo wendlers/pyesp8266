@@ -12,20 +12,24 @@ class SerialConnection(object):
         self.con = serial.Serial(port, baudrate, timeout=timeout)
 
         if hardrest:
-            # ESP reset through DTR
-            self.con.setDTR(True)
-            time.sleep(0.5)
-            self.con.setDTR(False)
+            self.reset()
 
-            data = self.con.readline()
-
-            while re.match('ready', data.strip(' ').strip('\n').strip('\r')) is None and len(data.strip(' ').strip('\n').strip('\r')) > 0:
-                data = self.con.readline()
-
-            print("Device ready!")
+        log.debug("Device ready!")
 
         self.con.flushOutput()
         self.con.flushInput()
+
+    def reset(self):
+
+        # ESP reset through DTR
+        self.con.setDTR(True)
+        time.sleep(0.5)
+        self.con.setDTR(False)
+
+        data = self.con.readline()
+
+        while re.match('ready', data.strip(' ').strip('\n').strip('\r')) is None and len(data.strip(' ').strip('\n').strip('\r')) > 0:
+            data = self.con.readline()
 
     def write(self, data):
 
@@ -62,3 +66,7 @@ class SerialConnection(object):
         log.debug("read: %s" % data)
 
         return data
+
+    def more_data(self):
+
+        return self.con.inWaiting() > 0

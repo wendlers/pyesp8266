@@ -17,7 +17,6 @@ if __name__ == "__main__":
 
     print("ssid=%s, secret=%s" % (ssid, secret))
 
-    # this turns on debugging from requests library
     log.basicConfig(level=log.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
     connection = SerialConnection(port='/dev/ttyUSB0')
